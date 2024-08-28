@@ -1,1 +1,68 @@
-<p>gauss-jordan works!</p>
+<div>
+    <div>
+        <div>
+            <h1>Gauss-Jordan</h1>
+            <p>Programa que resuelve sistema de ecuaciones usando el método de Gauss-Jordan</p>
+            <p>El programa supondrá que el número de incógnitas es el mismo que el número de ecuaciones</p>
+            <p>Ingresa la cantidad de incógnitas con las que cuenta tu sistema:</p>
+            <form (ngSubmit)="ingresarCoheficientes()">
+                <input type="number" name="col" [(ngModel)]="col" />
+                <button type="submit">capturar</button>
+            </form>
+        </div>
+    </div>
+
+    <div *ngIf="cartel">
+        <div>
+            <h2>Sistema de ecuaciones</h2>
+            <div class="table-container">
+                <form (ngSubmit)="validarYMostrarMatriz()"> 
+                    <table>
+                        <thead>
+                            <tr>
+                                <th *ngFor="let j of [].constructor(col); let i = index">
+                                    X{{ i + 1 }}
+                                </th>
+                                <th>Resultado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let fila of matriz; let i = index">
+                                <td *ngFor="let columna of fila; let j = index">
+                                    <!-- Condición para la última columna -->
+                                    <ng-container *ngIf="j < col; else equalsSign">
+                                        <input type="number" [(ngModel)]="matriz[i][j]" name="matriz-{{ i }}-{{ j }}" />
+                                    </ng-container>
+                                    <ng-template #equalsSign>
+                                        <input type="number" [(ngModel)]="matriz[i][j]"
+                                            name="matriz-{{ i }}-{{ j }}"/>
+                                    </ng-template>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button type="submit">Resolver pos Gauss-Jordan</button>
+                </form>
+            </div>
+        </div>
+        <hr />
+        <div *ngIf="!matrizInvalida">
+            <div>
+                <h2>Representación matricial</h2>
+                <table>
+                    <tr *ngFor="let fila of matriz">
+                        <td *ngFor="let columna of fila">{{ columna }}</td>
+                    </tr>
+                </table>
+            </div>
+            <hr>
+            <h2>Soluciones</h2>
+            <div *ngFor="let columna of matrizSolucion; let i = index">
+                <span>X<sub>{{ i + 1 }}</sub> = {{columna}}</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+
+</div>
