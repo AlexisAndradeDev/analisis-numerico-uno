@@ -2,12 +2,8 @@
     <h1>Gauss-Seidel</h1>
     <form (ngSubmit)="solveEquations()">
       <div>
-        <label for="numEquations">Número de ecuaciones:</label>
-        <input type="number" id="numEquations" [(ngModel)]="numEquations" name="numEquations" (change)="updateMatrix()">
-      </div>
-      <div>
-        <label for="numVariables">Número de variables:</label>
-        <input type="number" id="numVariables" [(ngModel)]="numVariables" name="numVariables" (change)="updateMatrix()">
+        <label for="numEquationsAndVariables">Número de ecuaciones y variables:</label>
+        <input type="number" id="numEquationsAndVariables" [(ngModel)]="numEquationsAndVariables" name="numEquationsAndVariables" (change)="updateMatrix()">
       </div>
       <div>
         <label for="tolerance">Error de aproximación deseado:</label>
@@ -21,7 +17,7 @@
             <th>Resultado</th>
           </tr>
           <tr *ngFor="let row of matrix; let i = index; trackBy: trackByIndex">
-            <td>{{i + 1}}</td>
+            <td>{{rowOrder[i]}}</td>
             <td *ngFor="let col of row; let j = index; trackBy: trackByIndex">
               <input type="number" [(ngModel)]="matrix[i][j]" name="matrix-{{i}}-{{j}}">
             </td>
@@ -33,7 +29,7 @@
       </div>
       <button type="submit">Resolver</button>
     </form>
-    <div *ngIf="solution.length > 0">
+    <div *ngIf="solution.length > 0" class="solution">
       <h2>Solución</h2>
       <div *ngFor="let sol of solution; let i = index; trackBy: trackByIndex">
         x{{i + 1}} = {{sol}}
