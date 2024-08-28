@@ -1,5 +1,6 @@
 <div class="container">
-    <app-sidebar></app-sidebar>
+    <button class="menu-btn" (click)="toggleSidebar()">&#9776;</button>
+    <app-sidebar [isOpen]="isSidebarOpen" (close)="closeSidebar()"></app-sidebar>
     <div class="content">
         <router-outlet></router-outlet>
     </div>

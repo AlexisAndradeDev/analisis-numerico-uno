@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -9,5 +9,10 @@ import { RouterModule } from '@angular/router';
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
+  @Input() isOpen = false;
+  @Output() close = new EventEmitter<void>();
 
+  closeSidebar() {
+    this.close.emit();
+  }
 }

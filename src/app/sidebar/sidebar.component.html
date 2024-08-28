@@ -1,6 +1,6 @@
-<nav class="sidebar">
+<nav class="sidebar" [class.open]="isOpen">
     <ul>
-        <li><a routerLink="/gauss-seidel" routerLinkActive="active">Gauss-Seidel</a></li>
-        <li><a routerLink="/gauss-jordan" routerLinkActive="active">Gauss-Jordan</a></li>
+        <li><a routerLink="/gauss-seidel" routerLinkActive="active" (click)="closeSidebar()">Gauss-Seidel</a></li>
+        <li><a routerLink="/gauss-jordan" routerLinkActive="active" (click)="closeSidebar()">Gauss-Jordan</a></li>
     </ul>
 </nav>

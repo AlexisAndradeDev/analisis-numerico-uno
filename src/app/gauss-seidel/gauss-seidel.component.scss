@@ -35,7 +35,7 @@ label {
 }
 
 input[type="number"] {
-  width: calc(100% - 20px);
+  width: 100%;
   padding: 10px;
   border: 1px solid $border-color;
   border-radius: 4px;
@@ -58,10 +58,15 @@ button:hover {
   background-color: darken($primary-color, 10%);
 }
 
+.table-container {
+  overflow-x: auto;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  min-width: 800px;
 }
 
 th, td {
@@ -76,7 +81,7 @@ th {
 }
 
 td input[type="number"] {
-  width: 100%;
+  width: 60px;
   padding: 8px;
   border: 1px solid $border-color;
   border-radius: 4px;

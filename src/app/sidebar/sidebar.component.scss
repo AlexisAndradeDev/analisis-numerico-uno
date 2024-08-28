@@ -1,7 +1,7 @@
 .sidebar {
-    width: 200px;
+    width: max(min(20vw, 200px), 100px);
     height: 100vh;
-    background-color: #0097a7;
+    background-color: rgba(0, 151, 167, 0.9);
     color: #fff;
     position: fixed;
     top: 0;
@@ -10,6 +10,8 @@
     flex-direction: column;
     padding: 20px;
     font-family: 'Helvetica', 'Arial', sans-serif;
+    transition: transform 0.3s ease;
+    z-index: 1000;
   }
   
   .sidebar ul {
@@ -38,4 +40,14 @@
   .sidebar a.active {
     font-weight: bold;
     background-color: #007b8a;
+  }
+  
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%);
+    }
+  
+    .sidebar.open {
+      transform: translateX(0);
+    }
   }

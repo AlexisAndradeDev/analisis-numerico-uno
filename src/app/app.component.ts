@@ -10,5 +10,13 @@ import { SidebarComponent } from './sidebar/sidebar.component';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'analisis-numerico-uno';
+  isSidebarOpen = false;
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  closeSidebar() {
+    this.isSidebarOpen = false;
+  }
 }
