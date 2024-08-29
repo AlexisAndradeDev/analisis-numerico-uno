@@ -1,5 +1,5 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -15,34 +15,36 @@ export class GaussJordanComponent {
   matrizInvalida = true;
   reglones = 0;
   columnas = 0;
-  matriz: number[][] = [];  // Cambiado a number para almacenar solo números
+  matriz: number[][] = [];
   matrizSolucion: number[] = [];
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['col']) {
+      this.actualizarMatriz();
+    }
+  }
+  actualizarMatriz() {
+    this.reglones = this.col;
+    this.columnas = this.col + 1;
+    this.matriz = this.creadorMatriz(this.reglones, this.columnas);
+  }
 
   ingresarCoheficientes() {
     this.matrizInvalida = true;
-    if(Number.isInteger(this.col) && this.col > 0){
-    this.reglones = this.col;
-    this.columnas = this.col + 1;
-    this.matriz = this.creadorMatriz(this.reglones, this.columnas); // Ajustado para incluir la columna extra para los términos independientes
-    this.cartel = true;
-    }else{
-      alert(`Debes de colocar un numero valido`);
+    if (Number.isInteger(this.col) && this.col > 0) {
+      this.actualizarMatriz();
+      this.cartel = true;
     }
   }
 
   creadorMatriz(row: number, col: number): number[][] {
-    let matriz: number[][] = [];
-    for (let i = 0; i < row; i++) {
-      let fila: number[] = new Array(col).fill(0);  // Inicializa cada celda con 0
-      matriz.push(fila);
-    }
-    return matriz;
+    return Array.from({ length: row }, () => Array(col).fill(0));
   }
 
   validarYMostrarMatriz() {
     for (let i = 0; i < this.matriz.length; i++) {
       for (let j = 0; j < this.matriz[i].length; j++) {
-        let valor = parseFloat(this.matriz[i][j] as any);  // Convierte a número usando parseFloat
+        let valor = parseFloat(this.matriz[i][j] as any);
         if (isNaN(valor)) {
           alert(`El valor en la posición (${i + 1}, ${j + 1}) no es un número válido.`);
           return;
@@ -156,5 +158,7 @@ export class GaussJordanComponent {
     return A.map(row => row[m - 1]);
   }
 
-
+  trackByIndex(index: number, obj: any): any {
+    return index;
+  }
 }
