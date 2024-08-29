@@ -35,6 +35,11 @@ export class GaussJordanComponent {
       this.actualizarMatriz();
       this.cartel = true;
     }
+    else {
+      this.col = 1
+      this.actualizarMatriz();
+      this.cartel = true;
+    }
   }
 
   creadorMatriz(row: number, col: number): number[][] {
