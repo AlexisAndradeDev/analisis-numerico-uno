@@ -109,3 +109,34 @@ h2 {
   font-weight: bold;
   color: $primary-color;
 }
+
+.iteration-controls {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.iteration-controls button {
+  margin: 0 10px;
+  padding: 10px 20px;
+  background-color: $primary-color;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.iteration-controls button:disabled {
+  background-color: lighten($primary-color, 30%);
+  cursor: not-allowed;
+}
+
+.iteration-info {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
