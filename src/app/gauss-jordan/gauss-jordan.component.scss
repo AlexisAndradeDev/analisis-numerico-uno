@@ -26,6 +26,7 @@ form {
 
 form div {
   margin-bottom: 15px;
+  text-align: center;
 }
 
 label {
@@ -35,7 +36,7 @@ label {
 }
 
 input[type="number"] {
-  width: 100%;
+  width: calc(100% - 22px);
   padding: 10px;
   border: 1px solid $border-color;
   border-radius: 4px;
@@ -43,15 +44,16 @@ input[type="number"] {
 }
 
 button {
-  display: block;
-  width: 100%;
-  padding: 10px;
+  display: inline-block;
+  width: auto;
+  padding: 10px 20px;
   background-color: $primary-color;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
+  margin: 0 5px;
 }
 
 button:hover {
@@ -108,4 +110,13 @@ h2 {
   font-size: 18px;
   font-weight: bold;
   color: $primary-color;
+}
+
+.button-group {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.button-group button {
+  margin: 0 10px;
 }

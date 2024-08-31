@@ -1,13 +1,15 @@
 <div>
     <div>
-        <div>
+        <div style="text-align: center;">
             <h1>Gauss-Jordan</h1>
             <p>Programa que resuelve sistemas de ecuaciones usando el método de Gauss-Jordan</p>
             <p>El programa supondrá que el número de ecuaciones es igual al número de incógnitas.</p>
             <div>
                 <label for="numEcuaciones">Número de ecuaciones:</label>
                 <input type="number" id="numEcuaciones" [(ngModel)]="col" (ngModelChange)="ingresarCoheficientes()" />
-                <button (click)="ingresarCoheficientes()">Ingresar coeficientes</button>
+            </div>
+            <div>
+                <button style="margin-top: 1rem;" (click)="ingresarCoheficientes()">Ingresar coeficientes</button>
             </div>
         </div>
     </div>
@@ -37,19 +39,26 @@
                     </tbody>
                 </table>
             </div>
-            <button type="submit">Resolver por Gauss-Jordan</button>
+            <div>
+                <button type="submit">Resolver por Gauss-Jordan</button>
+            </div>
         </form>
     </div>
     <hr />
     <div *ngIf="!matrizInvalida">
         <div>
-            <h2>Representación matricial</h2>
+            <h2>Iteración {{ iteracionActual + 1 }}: {{ iteraciones[iteracionActual].operacion }}</h2>
             <div class="table-container">
                 <table>
-                    <tr *ngFor="let fila of matriz">
+                    <tr *ngFor="let fila of iteraciones[iteracionActual].matriz">
                         <td *ngFor="let columna of fila">{{ columna }}</td>
                     </tr>
                 </table>
+            </div>
+            <div class="button-group">
+                <button (click)="anteriorIteracion()" [disabled]="iteracionActual === 0">Anterior</button>
+                <button (click)="siguienteIteracion()"
+                    [disabled]="iteracionActual === iteraciones.length - 1">Siguiente</button>
             </div>
         </div>
         <hr>
