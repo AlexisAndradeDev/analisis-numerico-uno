@@ -83,31 +83,36 @@ export class GaussSeidelComponent {
     const resultsCopy = [...this.results];
     const rowOrderCopy = [...this.rowOrder];
     const columnOrderCopy = [...this.columnOrder];
+
     for (let i = 0; i < n; i++) {
-      // Encontrar el índice de la fila con el valor absoluto más grande en la columna i
-      let maxRow = i;
+      // Encontrar el índice de la columna con el valor absoluto más grande en la fila i
+      let maxCol = i;
       for (let k = i + 1; k < n; k++) {
-        if (Math.abs(matrixCopy[k][i]) > Math.abs(matrixCopy[maxRow][i])) {
-          maxRow = k;
+        if (Math.abs(matrixCopy[i][k]) > Math.abs(matrixCopy[i][maxCol])) {
+          maxCol = k;
         }
       }
-      // Intercambiar la fila actual con la fila con el valor absoluto más grande
-      if (maxRow !== i) {
-        [matrixCopy[i], matrixCopy[maxRow]] = [matrixCopy[maxRow], matrixCopy[i]];
-        [resultsCopy[i], resultsCopy[maxRow]] = [resultsCopy[maxRow], resultsCopy[i]];
-        [rowOrderCopy[i], rowOrderCopy[maxRow]] = [rowOrderCopy[maxRow], rowOrderCopy[i]];
+
+      // Intercambiar la columna actual con la columna con el valor absoluto más grande
+      if (maxCol !== i) {
+        for (let row = 0; row < n; row++) {
+          [matrixCopy[row][i], matrixCopy[row][maxCol]] = [matrixCopy[row][maxCol], matrixCopy[row][i]];
+        }
+        [columnOrderCopy[i], columnOrderCopy[maxCol]] = [columnOrderCopy[maxCol], columnOrderCopy[i]];
       }
-      // Verificar si la columna actual es diagonalmente dominante
+
+      // Verificar si la fila actual es diagonalmente dominante
       let sum = 0;
       for (let j = 0; j < n; j++) {
         if (i !== j) {
-          sum += Math.abs(matrixCopy[j][i]);
+          sum += Math.abs(matrixCopy[i][j]);
         }
       }
       if (Math.abs(matrixCopy[i][i]) < sum) {
         return false;
       }
     }
+
     // Si llegamos aquí, la matriz es diagonalmente dominante
     this.matrix = matrixCopy;
     this.results = resultsCopy;
@@ -126,6 +131,7 @@ export class GaussSeidelComponent {
 
     // Asegurarse de que la matriz tenga solución
     if (this.determinant(this.matrix) == 0) {
+      this.solution = [];
       alert('La matriz no tiene solución (determinante = 0).');
       return;
     }
