@@ -4,6 +4,6 @@ import { GaussJordanComponent } from './gauss-jordan/gauss-jordan.component';
 
 export const routes: Routes = [
     { path: 'gauss-seidel', component: GaussSeidelComponent, title: "Gauss-Seidel" },
-    { path: 'gauss-jordan', component: GaussJordanComponent },
+    { path: 'gauss-jordan', component: GaussJordanComponent, title: "Gauss-Jordan" },
     { path: '', redirectTo: '/gauss-seidel', pathMatch: 'full' }
 ];
