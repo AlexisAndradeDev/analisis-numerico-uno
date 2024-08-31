@@ -1,53 +1,69 @@
 .sidebar {
-    width: max(min(20vw, 200px), 100px);
-    height: 100vh;
-    background-color: rgba(0, 151, 167, 0.9);
-    color: #fff;
-    position: fixed;
-    top: 0;
-    left: 0;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    font-family: 'Helvetica', 'Arial', sans-serif;
-    transition: transform 0.3s ease;
-    z-index: 1000;
+  width: max(min(20vw, 200px), 100px);
+  height: 100vh;
+  background-color: rgba(0, 151, 167, 0.9);
+  color: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+
+.sidebar.honk {
+  font-family: "Honk", system-ui;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "MORF" 17,
+    "SHLN" 42.8;
+}
+
+.sidebar h3 {
+  text-align: center;
+  font-family: 'Honk', 'Helvetica', 'Arial', sans-serif;  /* Cambia la fuente */
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin: 10px 0;
+}
+
+.sidebar a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+  padding: 10px;
+  display: block;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.sidebar a:hover {
+  background-color: #007b8a;
+}
+
+.sidebar a.active {
+  font-weight: bold;
+  background-color: #007b8a;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
   }
-  
-  .sidebar ul {
-    list-style: none;
-    padding: 0;
+
+  .sidebar.open {
+    transform: translateX(0);
   }
-  
-  .sidebar li {
-    margin: 10px 0;
-  }
-  
-  .sidebar a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 18px;
-    padding: 10px;
-    display: block;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-  }
-  
-  .sidebar a:hover {
-    background-color: #007b8a;
-  }
-  
-  .sidebar a.active {
-    font-weight: bold;
-    background-color: #007b8a;
-  }
-  
-  @media (max-width: 768px) {
-    .sidebar {
-      transform: translateX(-100%);
-    }
-  
-    .sidebar.open {
-      transform: translateX(0);
-    }
-  }
+}
