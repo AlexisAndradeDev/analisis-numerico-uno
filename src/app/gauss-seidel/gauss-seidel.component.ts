@@ -20,7 +20,7 @@ export class GaussSeidelComponent {
   variables: number[] = [];
   rowOrder: number[] = [];
   columnOrder: number[] = [];
-  iterations: { variables: number[], error: number }[] = [];
+  iterations: { variables: number[], error: number[] }[] = [];
   currentIterationIndex = 0;
 
   updateMatrix() {
@@ -146,26 +146,58 @@ export class GaussSeidelComponent {
       for (let i = 0; i < n; i++) {
         xOld[i] = x[i];
       }
+
       for (let i = 0; i < n; i++) {
         if (this.matrix[i][i] === 0) {
           alert('La diagonal principal no puede contener ceros.');
           return;
         }
-        let sum = this.results[i];
-        for (let j = 0; j < n; j++) {
+
+        let sum = this.results[i]; // se inicializa en el valor del resultado de la ecuación
+
+        // Restar los valores de las demás variables
+
+        // Las variables anteriores a la actual se toman con el valor
+        // actualizado con la iteración actual
+        for (let j = 0; j < i; j++) {
+          sum -= this.matrix[i][j] * x[j];
+        }
+
+        // Las variables siguientes a la actual se toman con el valor
+        // antiguo (ya que no han sido actualizadas en esta iteración)
+        for (let j = i+1; j < n; j++) {
           if (i !== j) {
-            sum -= this.matrix[i][j] * x[j];
+            sum -= this.matrix[i][j] * xOld[j];
           }
         }
         x[i] = sum / this.matrix[i][i];
       }
-      let error = 0;
-      for (let i = 0; i < n; i++) {
-        error += Math.abs(x[i] - xOld[i]);
-      }
-      this.iterations.push({ variables: [...x], error });
 
-      if (error < this.tolerance) {
+      var error: number[] = [];
+      for (let i = 0; i < n; i++) {
+        if (x[i] === 0) {
+          // se suma un valor positivo extremadamente pequeño para evitar 
+          // divisiones entre cero
+          var error_i = Math.abs((x[i] - xOld[i])/(x[i] + Number.MIN_VALUE));
+        } 
+        else {
+          var error_i = Math.abs((x[i] - xOld[i])/x[i]);
+        }
+
+        error.push(error_i);
+      }
+      this.iterations.push({ variables: [...x], error: error });
+
+      // Determinar si ya se encontró la solución
+      let smaller_than_tolerance = true;
+      for (let error_i of error) {
+        if (error_i > this.tolerance) {
+          smaller_than_tolerance = false;
+          break;
+        }        
+      }
+
+      if (smaller_than_tolerance) {
         // Reordenar la solución según el orden de las columnas
         this.solution = Array(n).fill(0);
         for (let i = 0; i < n; i++) {
@@ -174,6 +206,10 @@ export class GaussSeidelComponent {
         return;
       }
     }
+
+    // Se llega a este punto si se acabaron las iteraciones y no se llegó
+    // al error aproximado deseado
+    alert("(!) Se llegó al límite de iteraciones. No se llegó al error aproximado deseado. Se despliegan los resultados obtenidos con el error conseguido.")
     // Reordenar la solución según el orden de las columnas
     this.solution = Array(n).fill(0);
     for (let i = 0; i < n; i++) {

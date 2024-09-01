@@ -41,14 +41,14 @@
                 <tr>
                     <th>Variable</th>
                     <th>Valor</th>
+                    <th>Error</th>
                 </tr>
                 <tr *ngFor="let v of iterations[currentIterationIndex].variables; let i = index; trackBy: trackByIndex">
-                    <td>x{{i + 1}}</td>
+                    <td>x{{columnOrder[i]}}</td>
                     <td>{{v}}</td>
+                    <td>{{iterations[currentIterationIndex].error[i]}}</td>
                 </tr>
                 <tr>
-                    <td>Error</td>
-                    <td>{{iterations[currentIterationIndex].error}}</td>
                 </tr>
             </table>
         </div>
