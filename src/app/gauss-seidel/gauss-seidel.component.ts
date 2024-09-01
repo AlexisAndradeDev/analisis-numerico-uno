@@ -17,7 +17,6 @@ export class GaussSeidelComponent {
   matrix: number[][] = [];
   results: number[] = [];
   solution: number[] = [];
-  variables: number[] = [];
   rowOrder: number[] = [];
   columnOrder: number[] = [];
   iterations: { variables: number[], error: number[] }[] = [];
@@ -39,7 +38,6 @@ export class GaussSeidelComponent {
     }
     this.matrix = newMatrix;
     this.results = newResults;
-    this.variables = Array.from({ length: this.numVariables }, (_, i) => i + 1);
     this.rowOrder = Array.from({ length: this.numEquations }, (_, i) => i + 1);
     this.columnOrder = Array.from({ length: this.numVariables }, (_, i) => i + 1);
   }
