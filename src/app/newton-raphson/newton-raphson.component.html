@@ -1,0 +1,37 @@
+<div class="container">
+    <h1>Método de Newton-Raphson Mejorado</h1>
+    <form [formGroup]="form" (ngSubmit)="findRoot()">
+      <div>
+        <label for="function">Función:</label>
+        <input id="function" formControlName="function" placeholder="e.g. x^2 - 4" />
+      </div>
+      <div>
+        <label for="initialGuess">Aproximación inicial:</label>
+        <input id="initialGuess" formControlName="initialGuess" placeholder="e.g. 2" />
+      </div>
+      <div>
+        <label for="tolerance">Tolerancia:</label>
+        <input id="tolerance" formControlName="tolerance" placeholder="e.g. 0.0001" />
+      </div>
+      <div>
+        <label for="maxIterations">Máximo de iteraciones:</label>
+        <input id="maxIterations" formControlName="maxIterations" placeholder="e.g. 100" />
+      </div>
+      <button type="submit" [disabled]="form.invalid">Encontrar raíz</button>
+    </form>
+    <div *ngIf="iterations.length > 0">
+      <h2>Iteración {{ currentIterationIndex + 1 }} de {{ iterations.length }}</h2>
+      <div class="iteration-info">
+        <p><strong>x0:</strong> {{ iterations[currentIterationIndex].x0 }}</p>
+        <p><strong>x1:</strong> {{ iterations[currentIterationIndex].x1 }}</p>
+        <p><strong>f(x0):</strong> {{ iterations[currentIterationIndex].fx0 }}</p>
+        <p><strong>f'(x0):</strong> {{ iterations[currentIterationIndex].fpx0 }}</p>
+        <p><strong>f''(x0):</strong> {{ iterations[currentIterationIndex].fppx0 }}</p>
+        <p><strong>Error:</strong> {{ iterations[currentIterationIndex].error }}</p>
+      </div>
+      <div class="iteration-controls">
+        <button (click)="prevIteration()" [disabled]="currentIterationIndex === 0">Anterior</button>
+        <button (click)="nextIteration()" [disabled]="currentIterationIndex === iterations.length - 1">Siguiente</button>
+      </div>
+    </div>
+  </div>
