@@ -1,142 +1,82 @@
-$primary-color: #0097a7;
-$secondary-color: #f9f9f9;
-$border-color: #ddd;
-$text-color: #333;
-
-* {
-  font-family: 'Helvetica', 'Arial', sans-serif;
-  background-color: $secondary-color;
-  color: $text-color;
-}
-
-h1 {
-  text-align: center;
-  color: $primary-color;
-  margin-bottom: 20px;
-}
-
-form {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-form div {
-  margin-bottom: 15px;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid $border-color;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-button {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  background-color: $primary-color;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-button:hover {
-  background-color: darken($primary-color, 10%);
-}
-
-.table-container {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  min-width: 800px;
-}
-
-th, td {
-  padding: 10px;
-  text-align: center;
-  border: 1px solid $border-color;
-}
-
-th {
-  background-color: $primary-color;
-  color: #fff;
-}
-
-td input[type="number"] {
-  width: 60px;
-  padding: 8px;
-  border: 1px solid $border-color;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-h2 {
-  text-align: center;
-  color: $primary-color;
-  margin-top: 30px;
-}
-
-.solution {
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.solution div {
-  margin-bottom: 10px;
-  font-size: 18px;
-  font-weight: bold;
-  color: $primary-color;
-}
-
-.iteration-controls {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-.iteration-controls button {
-  margin: 0 10px;
-  padding: 10px 20px;
-  background-color: $primary-color;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.iteration-controls button:disabled {
-  background-color: lighten($primary-color, 30%);
-  cursor: not-allowed;
-}
-
-.iteration-info {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  h1 {
+    text-align: center;
+    color: #0097a7;
+    margin-bottom: 20px;
+  }
+  
+  form {
+    margin-bottom: 20px;
+  }
+  
+  form div {
+    margin-bottom: 15px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #0097a7;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  button:hover {
+    background-color: darken(#0097a7, 10%);
+  }
+  
+  .iteration-info {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .iteration-controls {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  
+  .iteration-controls button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    background-color: #0097a7;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .iteration-controls button:disabled {
+    background-color: lighten(#0097a7, 30%);
+    cursor: not-allowed;
+  }

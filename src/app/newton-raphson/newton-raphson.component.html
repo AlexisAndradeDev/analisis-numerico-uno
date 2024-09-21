@@ -33,5 +33,6 @@
         <button (click)="prevIteration()" [disabled]="currentIterationIndex === 0">Anterior</button>
         <button (click)="nextIteration()" [disabled]="currentIterationIndex === iterations.length - 1">Siguiente</button>
       </div>
+      <apx-chart [series]="chartSeries" [chart]="chart" [xaxis]="xaxis" [yaxis]="yaxis" [title]="title" [markers]="markers"></apx-chart>
     </div>
   </div>
