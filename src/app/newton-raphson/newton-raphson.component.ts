@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { derivative, evaluate } from 'mathjs';
+import { derivative, evaluate, isComplex, parse, round } from 'mathjs';
 import { Iteration } from '../interface/iteration';
-import { NgApexchartsModule } from 'ng-apexcharts';
+import { ApexResponsive, NgApexchartsModule } from 'ng-apexcharts';
 import { ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis, ApexTitleSubtitle, ApexMarkers } from 'ng-apexcharts';
 
 @Component({
@@ -17,21 +17,24 @@ export class NewtonRaphsonComponent {
   form: FormGroup;
   iterations: Iteration[] = [];
   currentIterationIndex: number = 0;
-
   chartSeries: ApexAxisChartSeries = [];
   chart: ApexChart = {
     type: 'line',
-    height: 350
+    height: 500,
   };
   xaxis: ApexXAxis = {
     title: {
-      text: 'X'
-    }
+      text: 'x0'
+    },
+    tickAmount: 4,
+    decimalsInFloat: 5
   };
   yaxis: ApexYAxis = {
     title: {
-      text: 'Y'
-    }
+      text: 'f(x0)'
+    },
+    tickAmount: 4,
+    decimalsInFloat: 5
   };
   title: ApexTitleSubtitle = {
     text: 'Función y tangente en x0',
@@ -46,6 +49,7 @@ export class NewtonRaphsonComponent {
       size: 7
     }
   };
+  errorMessage: string = '';
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
@@ -53,51 +57,93 @@ export class NewtonRaphsonComponent {
       initialGuess: ['', [Validators.required, Validators.pattern(/^-?\d+(\.\d+)?$/)]],
       tolerance: ['', [Validators.required, Validators.pattern(/^\d+(\.\d+)?$/)]],
       maxIterations: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+      decimals: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
     });
   }
 
+  addIteration(x0: number, x1: number, fx0: number, fpx0: number, fppx0: number,
+      error: number) {
+    this.iterations.push({ x0, x1, fx0, fpx0, fppx0, error });
+  }
+
   findRoot() {
-    const { function: func, initialGuess, tolerance, maxIterations } = this.form.value;
+    this.iterations = [];
+    this.errorMessage = '';
+    const { function: func, initialGuess, tolerance, maxIterations, decimals } = this.form.value;
+
+    // verificar si la función es parseable
+    try {
+      parse(func);
+    } catch (error) {
+      this.errorMessage = 'La función introducida no es válida.';
+      return;
+    }
+
     const f = (x: number) => evaluate(func, { x });
-    const fPrime = (x: number) => derivative(func, 'x').evaluate({ x });
-    const fDoublePrime = (x: number) => derivative(derivative(func, 'x'), 'x').evaluate({ x });
+    const fDerivative1 = (x: number) => derivative(func, 'x').evaluate({ x });
+    const fDerivative2 = (x: number) => derivative(derivative(func, 'x'), 'x').evaluate({ x });
+
     let x0 = parseFloat(initialGuess);
-    const tol = parseFloat(tolerance);
-    const maxIter = parseInt(maxIterations, 10);
+    const tolerance_ = parseFloat(tolerance) / 100;
+    const maxIterations_ = parseInt(maxIterations, 10);
+    const decimals_ = parseInt(decimals, 10);
     this.iterations = [];
     let x1;
     let iter = 0;
-    while (iter < maxIter) {
-      const fx0 = f(x0);
-      const fpx0 = fPrime(x0);
-      const fppx0 = fDoublePrime(x0);
-      if (Math.abs(fpx0) < 1e-10) {
-        this.iterations.push({
-          x0,
-          x1: NaN,
-          fx0,
-          fpx0,
-          fppx0,
-          error: NaN,
-        });
+    let rootFound = false;
+
+    while (iter < maxIterations_) {
+      x0 = round(x0, decimals_);
+
+      let fx0, fpx0, fppx0;
+      try {
+        fx0 = round(f(x0), decimals_);
+        fpx0 = round(fDerivative1(x0), decimals_);
+        fppx0 = round(fDerivative2(x0), decimals_);
+      } catch (error) {
+        this.addIteration(x0, NaN, NaN, NaN, NaN, NaN);
+        this.errorMessage = 'Error al evaluar la función. Puede que haya valores imaginarios o la función esté mal escrita.';
         break;
       }
-      x1 = x0 - (fx0 * fpx0) / (fpx0 * fpx0 - fx0 * fppx0);
-      const error = Math.abs((x1 - x0) / x1);
-      this.iterations.push({
-        x0,
-        x1,
-        fx0,
-        fpx0,
-        fppx0,
-        error,
-      });
-      if (error < tol) {
+
+      if (fpx0 === 0) {
+        this.addIteration(x0, NaN, fx0, fpx0, fppx0, NaN);
+        this.errorMessage = 'f\'(x0) es cero. El método no puede continuar.';
         break;
       }
+
+      // En algunas funciones, si no se redondea x1, termina aproximándose a 
+      // la raíz verdadera, pero nunca llega a tenerse un error menor a la
+      // tolerancia.
+      // Por ejemplo, puede que se aproxime a cero en x1 = 2e-10->4e-11->5e-12->...,
+      // y se tendría un error aproximado siempre mayor a 1%
+      x1 = round(x0 - (fx0 * fpx0) / (fpx0 * fpx0 - fx0 * fppx0), decimals_);
+
+      if (Number.isNaN(x1)) {
+        this.addIteration(x0, NaN, fx0, fpx0, fppx0, NaN);
+        this.errorMessage = 'x1 tomó un valor NaN (inválido). Usualmente debido a que se realizaron operaciones con complejos o funciones fuera de su dominio (como logaritmos para números negativos).';
+        break;
+      }
+
+      let error: number;
+      // en ocasiones como sin((x)*(pi/180)), se llega a x1=x0=0 y se 
+      // produciría división entre cero cíclica
+      if (x1 === x0) error = 0
+      else error = round(Math.abs((x1 - x0) / x1), decimals_);
+
+      this.addIteration(x0, x1, fx0, fpx0, fppx0, error);
+
+      if (error < tolerance_) {
+        rootFound = true;
+        break;
+      }
+
       x0 = x1;
       iter++;
     }
+
+    if (!rootFound && !this.errorMessage) this.errorMessage = 'No se encontró una raíz en el límite de iteraciones establecido.'
+
     this.currentIterationIndex = this.iterations.length - 1;
     this.updateChart();
   }
@@ -121,25 +167,23 @@ export class NewtonRaphsonComponent {
     const x0 = currentIteration.x0;
     const fx0 = currentIteration.fx0;
     const fpx0 = currentIteration.fpx0;
-
-    const xValues = Array.from({ length: 20 }, (_, i) => x0 - 2 + i * 0.2);
+    const xValues = Array.from({ length: 100 }, (_, i) => x0 - 2 + i * 0.04);
     const yValues = xValues.map(x => evaluate(this.form.value.function, { x }));
-
-    // tangente (primera derivada)
     const tangentValues = xValues.map(x => fx0 + fpx0 * (x - x0));
 
     this.chartSeries = [
       {
         name: 'f(x0)',
-        data: xValues.map((x, i) => ({ x, y: yValues[i] }))
+        data: xValues.map((x, i) => ({ x: x, y: yValues[i] })).filter(point => !isComplex(point.y) && !Number.isNaN(point.y) && Number.isFinite(point.y))
       },
       {
         name: 'f\'(x0)',
-        data: xValues.map((x, i) => ({ x, y: tangentValues[i] }))
+        data: xValues.map((x, i) => ({ x: x, y: tangentValues[i] })).filter(point => !isComplex(point.y) && !Number.isNaN(point.y) && Number.isFinite(point.y))
       },
       {
         name: 'x0',
-        data: [{ x: x0, y: fx0 }]
+        data: !isComplex(fx0) && !Number.isNaN(fx0) && Number.isFinite(fx0) ? [{ x: x0, y: fx0 }] : [],
+        color: '#FF4560'
       }
     ];
   }

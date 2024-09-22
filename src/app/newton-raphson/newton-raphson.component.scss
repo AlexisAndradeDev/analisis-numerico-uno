@@ -5,37 +5,37 @@
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  h1 {
+}
+
+h1 {
     text-align: center;
     color: #0097a7;
     margin-bottom: 20px;
-  }
-  
-  form {
+}
+
+form {
     margin-bottom: 20px;
-  }
-  
-  form div {
+}
+
+form div {
     margin-bottom: 15px;
-  }
-  
-  label {
+}
+
+label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
-  }
-  
-  input {
+}
+
+input {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
-  }
-  
-  button {
+}
+
+button {
     display: block;
     width: 100%;
     padding: 10px;
@@ -45,27 +45,27 @@
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
-  }
-  
-  button:hover {
+}
+
+button:hover {
     background-color: darken(#0097a7, 10%);
-  }
-  
-  .iteration-info {
+}
+
+.iteration-info {
     margin: 20px 0;
     padding: 20px;
     background: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .iteration-controls {
+}
+
+.iteration-controls {
     display: flex;
     justify-content: center;
     margin: 20px 0;
-  }
-  
-  .iteration-controls button {
+}
+
+.iteration-controls button {
     margin: 0 10px;
     padding: 10px 20px;
     background-color: #0097a7;
@@ -74,9 +74,9 @@
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
-  }
-  
-  .iteration-controls button:disabled {
+}
+
+.iteration-controls button:disabled {
     background-color: lighten(#0097a7, 30%);
     cursor: not-allowed;
-  }
+}
