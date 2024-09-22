@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { derivative, evaluate, isComplex, parse, round } from 'mathjs';
 import { Iteration } from '../interface/iteration';
-import { ApexResponsive, NgApexchartsModule } from 'ng-apexcharts';
+import { NgApexchartsModule } from 'ng-apexcharts';
 import { ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis, ApexTitleSubtitle, ApexMarkers } from 'ng-apexcharts';
+
+declare var MathJax: any;
 
 @Component({
   selector: 'app-newton-raphson',
@@ -13,7 +15,7 @@ import { ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis, ApexTitleSubtitle
   templateUrl: './newton-raphson.component.html',
   styleUrls: ['./newton-raphson.component.scss']
 })
-export class NewtonRaphsonComponent {
+export class NewtonRaphsonComponent implements AfterViewInit {
   form: FormGroup;
   iterations: Iteration[] = [];
   currentIterationIndex: number = 0;
@@ -50,6 +52,7 @@ export class NewtonRaphsonComponent {
     }
   };
   errorMessage: string = '';
+  root: number | undefined;
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
@@ -59,6 +62,56 @@ export class NewtonRaphsonComponent {
       maxIterations: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
       decimals: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
     });
+
+    this.form.get('function')?.valueChanges.subscribe(value => {
+      this.renderMath(value);
+    });
+  }
+
+  ngAfterViewInit() {
+    this.renderMath(this.form.get('function')?.value);
+  }
+
+  numberIsNan(num: number) {
+    return Number.isNaN(num);
+  }
+
+  renderMath(f: string) {
+    const functionLatex = document.getElementById('function-latex');
+    if (functionLatex) {
+      try {
+        const parsed = parse(f);
+        const latex = parsed.toTex();
+        functionLatex.innerHTML = `$$${latex}$$`;
+        MathJax.typesetPromise([functionLatex]);  
+      } catch (error) {
+        functionLatex.textContent = 'Función no válida.';
+      }
+    }
+
+    const derivative1Latex = document.getElementById('derivative-1-latex');
+    if (derivative1Latex) {
+      try {
+        const parsed = derivative(parse(f), 'x');
+        const latex = parsed.toTex();
+        derivative1Latex.innerHTML = `$$${latex}$$`;
+        MathJax.typesetPromise([derivative1Latex]);  
+      } catch (error) {
+        derivative1Latex.textContent = 'Función no válida.';
+      }
+    }
+
+    const derivative2Latex = document.getElementById('derivative-2-latex');
+    if (derivative2Latex) {
+      try {
+        const parsed = derivative(derivative(f, 'x'), 'x');
+        const latex = parsed.toTex();
+        derivative2Latex.innerHTML = `$$${latex}$$`;
+        MathJax.typesetPromise([derivative2Latex]);  
+      } catch (error) {
+        derivative2Latex.textContent = 'Función no válida.';
+      }
+    }
   }
 
   addIteration(x0: number, x1: number, fx0: number, fpx0: number, fppx0: number,
@@ -90,7 +143,7 @@ export class NewtonRaphsonComponent {
     this.iterations = [];
     let x1;
     let iter = 0;
-    let rootFound = false;
+    this.root = undefined;
 
     while (iter < maxIterations_) {
       x0 = round(x0, decimals_);
@@ -106,7 +159,7 @@ export class NewtonRaphsonComponent {
         break;
       }
 
-      if (fpx0 === 0) {
+      if (fpx0 === 0 && fx0 !== 0) {
         this.addIteration(x0, NaN, fx0, fpx0, fppx0, NaN);
         this.errorMessage = 'f\'(x0) es cero. El método no puede continuar.';
         break;
@@ -119,22 +172,32 @@ export class NewtonRaphsonComponent {
       // y se tendría un error aproximado siempre mayor a 1%
       x1 = round(x0 - (fx0 * fpx0) / (fpx0 * fpx0 - fx0 * fppx0), decimals_);
 
-      if (Number.isNaN(x1)) {
+      if (Number.isNaN(x1) && fx0 !== 0) {
         this.addIteration(x0, NaN, fx0, fpx0, fppx0, NaN);
         this.errorMessage = 'x1 tomó un valor NaN (inválido). Usualmente debido a que se realizaron operaciones con complejos o funciones fuera de su dominio (como logaritmos para números negativos).';
         break;
       }
 
       let error: number;
-      // en ocasiones como sin((x)*(pi/180)), se llega a x1=x0=0 y se 
+      // En ocasiones como sin((x)*(pi/180)), se llega a x1=x0=0 y se 
       // produciría división entre cero cíclica
       if (x1 === x0) error = 0
       else error = round(Math.abs((x1 - x0) / x1), decimals_);
 
+      // En algunas ocasiones, se llega a la raíz pero se obtiene NaN en x1 y 
+      // por consecuencia en el error también. 
+      // Por ejemplo, en 2x^e, f(x) y todas las derivadas son 0 en la raíz 
+      // x = 0 y x1 resulta NaN, pero la raíz es encontrada
+      if (fx0 === 0) {
+        this.addIteration(x0, x1, fx0, fpx0, fppx0, error);
+        this.root = x0;
+        break;
+      }
+
       this.addIteration(x0, x1, fx0, fpx0, fppx0, error);
 
       if (error < tolerance_) {
-        rootFound = true;
+        this.root = x1;
         break;
       }
 
@@ -142,7 +205,7 @@ export class NewtonRaphsonComponent {
       iter++;
     }
 
-    if (!rootFound && !this.errorMessage) this.errorMessage = 'No se encontró una raíz en el límite de iteraciones establecido.'
+    if (this.root === undefined && !this.errorMessage) this.errorMessage = 'No se encontró una raíz en el límite de iteraciones establecido.'
 
     this.currentIterationIndex = this.iterations.length - 1;
     this.updateChart();
@@ -167,7 +230,7 @@ export class NewtonRaphsonComponent {
     const x0 = currentIteration.x0;
     const fx0 = currentIteration.fx0;
     const fpx0 = currentIteration.fpx0;
-    const xValues = Array.from({ length: 100 }, (_, i) => x0 - 2 + i * 0.04);
+    const xValues = Array.from({ length: 400 }, (_, i) => x0 - 5 + i * 0.025);
     const yValues = xValues.map(x => evaluate(this.form.value.function, { x }));
     const tangentValues = xValues.map(x => fx0 + fpx0 * (x - x0));
 

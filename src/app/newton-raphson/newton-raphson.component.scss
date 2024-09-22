@@ -7,10 +7,11 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
+h1, h2 {
     text-align: center;
     color: #0097a7;
     margin-bottom: 20px;
+    margin-top: 50px;
 }
 
 form {
@@ -79,4 +80,8 @@ button:hover {
 .iteration-controls button:disabled {
     background-color: lighten(#0097a7, 30%);
     cursor: not-allowed;
+}
+
+.field-info {
+    font-size: 0.85rem;
 }
