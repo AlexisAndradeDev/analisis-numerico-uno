@@ -20,6 +20,7 @@
     "@angular/router": "^17.3.0",
     "apexcharts": "^3.45.2",
     "chart.js": "^4.4.4",
+    "mathjax-angular": "^2.2.1",
     "mathjs": "^13.1.1",
     "ng-apexcharts": "^1.9.0",
     "rxjs": "~7.8.0",

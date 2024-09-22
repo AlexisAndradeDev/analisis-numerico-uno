@@ -2,9 +2,17 @@
     <h1>Método de Newton-Raphson Mejorado</h1>
     <form [formGroup]="form" (ngSubmit)="findRoot()">
         <div>
-            <label for="function">Función*</label>
-            <input id="function" formControlName="function" placeholder="(!) Las funciones trigonométricas utilizan radianes. Ej. cos(x*pi/180) para cos(x) en grados" />
+            <label for="function">Función f(x)*</label>
+            <p class="field-info">• La función debe estar en términos de x.<br />• Funciones generales: absoluto - abs(argumento); potencia - pow(base, exponente); raíz cuadrada - sqrt(arg); raíz n-ésima - nthRoot(arg, n)<br />• Logaritmo: log(arg, base)<br />• Funciones trigonométricas: cos(arg), sin(arg), tan(arg), acos(arg), asin(arg), atan(arg)<br />• Las funciones trigonométricas utilizan radianes. Ej. cos((x-90)*(pi/180)) para cos(x-90) en grados<br />• Constantes: pi, e (Euler), phi (número áureo), tau (2*pi)</p>
+            <input id="function" formControlName="function"
+                placeholder="cos((x-90)*(pi/180))" />
         </div>
+        <p>f(x)</p>
+        <div id="function-latex" style="margin-top: 20px;"></div>
+        <p>f'(x)</p>
+        <div id="derivative-1-latex" style="margin-top: 20px;"></div>
+        <p>f''(x)</p>
+        <div id="derivative-2-latex" style="margin-top: 20px;"></div>
         <div>
             <label for="initialGuess">Aproximación inicial*</label>
             <input id="initialGuess" formControlName="initialGuess" placeholder="ej. 2" />
@@ -19,21 +27,22 @@
         </div>
         <div>
             <label for="decimals">Número de decimales para x0 y x1 (<=15)*</label>
-            <input id="decimals" formControlName="decimals" placeholder="ej. 10" />
+                    <input id="decimals" formControlName="decimals" placeholder="ej. 10" />
         </div>
         <button type="submit" [disabled]="form.invalid">Encontrar raíz</button>
     </form>
-    
+
     <div *ngIf="errorMessage" class="error-message">
         <p>{{ errorMessage }}</p>
     </div>
-    
+
     <div *ngIf="iterations.length > 0 && !errorMessage">
         <h2>Resultado Final</h2>
-        <p><strong>Raíz encontrada:</strong> {{ iterations[iterations.length-1].x1 }}</p>
+        <p><strong>Raíz encontrada:</strong> {{ root }}</p>
         <p><strong>Error:</strong> {{ iterations[iterations.length-1].error * 100 }}%</p>
+        <p *ngIf="numberIsNan(iterations[iterations.length-1].error)">En algunas ocasiones, se llega a la raíz pero se obtiene NaN en x1 y por consecuencia en el error también. Por ejemplo, en 2x^e, f(x) y todas las derivadas son 0 en la raíz x = 0 y x1 resulta NaN, pero la raíz es encontrada.</p>
     </div>
-    
+
     <div *ngIf="iterations.length > 0">
         <h2>Iteración {{ currentIterationIndex + 1 }} de {{ iterations.length }}</h2>
         <div class="iteration-info">
@@ -46,7 +55,8 @@
         </div>
         <div class="iteration-controls">
             <button (click)="prevIteration()" [disabled]="currentIterationIndex === 0">Anterior</button>
-            <button (click)="nextIteration()" [disabled]="currentIterationIndex === iterations.length - 1">Siguiente</button>
+            <button (click)="nextIteration()"
+                [disabled]="currentIterationIndex === iterations.length - 1">Siguiente</button>
         </div>
         <apx-chart [series]="chartSeries" [chart]="chart" [xaxis]="xaxis" [yaxis]="yaxis" [title]="title"></apx-chart>
     </div>
