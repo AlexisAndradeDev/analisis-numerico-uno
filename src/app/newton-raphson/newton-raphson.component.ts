@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { derivative, evaluate, isComplex, parse, round } from 'mathjs';
+import { derivative, equal, evaluate, isComplex, isZero, parse, round, smaller } from 'mathjs';
 import { Iteration } from '../interface/iteration';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis, ApexTitleSubtitle, ApexMarkers } from 'ng-apexcharts';
@@ -57,7 +57,7 @@ export class NewtonRaphsonComponent implements AfterViewInit {
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       function: ['', Validators.required],
-      initialGuess: ['', [Validators.required, Validators.pattern(/^-?\d+(\.\d+)?$/)]],
+      initialGuess: ['', [Validators.required]],
       tolerance: ['', [Validators.required, Validators.pattern(/^\d+(\.\d+)?$/)]],
       maxIterations: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
       decimals: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
@@ -74,6 +74,10 @@ export class NewtonRaphsonComponent implements AfterViewInit {
 
   numberIsNan(num: number) {
     return Number.isNaN(num);
+  }
+
+  rootFoundWhenX1IsZero(x0: number, x1: number) {
+    return equal(x0, x1) && isZero(x1);
   }
 
   renderMath(f: string) {
@@ -119,6 +123,11 @@ export class NewtonRaphsonComponent implements AfterViewInit {
     this.iterations.push({ x0, x1, fx0, fpx0, fppx0, error });
   }
 
+  ifComplexZeroReturnRealZero(num: number) {
+    if (isZero(num)) return 0;
+    return num;
+  }
+
   findRoot() {
     this.iterations = [];
     this.errorMessage = '';
@@ -136,7 +145,7 @@ export class NewtonRaphsonComponent implements AfterViewInit {
     const fDerivative1 = (x: number) => derivative(func, 'x').evaluate({ x });
     const fDerivative2 = (x: number) => derivative(derivative(func, 'x'), 'x').evaluate({ x });
 
-    let x0 = parseFloat(initialGuess);
+    let x0 = evaluate(initialGuess);
     const tolerance_ = parseFloat(tolerance) / 100;
     const maxIterations_ = parseInt(maxIterations, 10);
     const decimals_ = parseInt(decimals, 10);
@@ -146,7 +155,7 @@ export class NewtonRaphsonComponent implements AfterViewInit {
     this.root = undefined;
 
     while (iter < maxIterations_) {
-      x0 = round(x0, decimals_);
+      x0 = this.ifComplexZeroReturnRealZero(round(x0, decimals_));
 
       let fx0, fpx0, fppx0;
       try {
@@ -159,20 +168,12 @@ export class NewtonRaphsonComponent implements AfterViewInit {
         break;
       }
 
-      if (fpx0 === 0 && fx0 !== 0) {
-        this.addIteration(x0, NaN, fx0, fpx0, fppx0, NaN);
-        this.errorMessage = 'f\'(x0) es cero. El método no puede continuar.';
-        break;
-      }
+      x1 = this.ifComplexZeroReturnRealZero(round(
+        evaluate(`${x0} - (${fx0} * ${fpx0}) / (${fpx0} * ${fpx0} - ${fx0} * ${fppx0})`), 
+        decimals_
+      ))
 
-      // En algunas funciones, si no se redondea x1, termina aproximándose a 
-      // la raíz verdadera, pero nunca llega a tenerse un error menor a la
-      // tolerancia.
-      // Por ejemplo, puede que se aproxime a cero en x1 = 2e-10->4e-11->5e-12->...,
-      // y se tendría un error aproximado siempre mayor a 1%
-      x1 = round(x0 - (fx0 * fpx0) / (fpx0 * fpx0 - fx0 * fppx0), decimals_);
-
-      if (Number.isNaN(x1) && fx0 !== 0) {
+      if (Number.isNaN(x1) && !isZero(fx0)) {
         this.addIteration(x0, NaN, fx0, fpx0, fppx0, NaN);
         this.errorMessage = 'x1 tomó un valor NaN (inválido). Usualmente debido a que se realizaron operaciones con complejos o funciones fuera de su dominio (como logaritmos para números negativos).';
         break;
@@ -181,14 +182,14 @@ export class NewtonRaphsonComponent implements AfterViewInit {
       let error: number;
       // En ocasiones como sin((x)*(pi/180)), se llega a x1=x0=0 y se 
       // produciría división entre cero cíclica
-      if (x1 === x0) error = 0
-      else error = round(Math.abs((x1 - x0) / x1), decimals_);
+      if (equal(x1, x0)) error = 0
+      else error = round(evaluate(`abs((${x1} - ${x0}) / ${x1})`), decimals_);
 
       // En algunas ocasiones, se llega a la raíz pero se obtiene NaN en x1 y 
       // por consecuencia en el error también. 
       // Por ejemplo, en 2x^e, f(x) y todas las derivadas son 0 en la raíz 
       // x = 0 y x1 resulta NaN, pero la raíz es encontrada
-      if (fx0 === 0) {
+      if (isZero(fx0)) {
         this.addIteration(x0, x1, fx0, fpx0, fppx0, error);
         this.root = x0;
         break;
@@ -196,7 +197,7 @@ export class NewtonRaphsonComponent implements AfterViewInit {
 
       this.addIteration(x0, x1, fx0, fpx0, fppx0, error);
 
-      if (error < tolerance_) {
+      if (smaller(error, tolerance_)) {
         this.root = x1;
         break;
       }

@@ -27,7 +27,8 @@
         </div>
         <div>
             <label for="decimals">Número de decimales para x0 y x1 (<=15)*</label>
-                    <input id="decimals" formControlName="decimals" placeholder="ej. 10" />
+            <p class="field-info">En algunas funciones, si no se redondea x1, termina aproximándose a la raíz verdadera, pero nunca llega a tenerse un error menor a la tolerancia. Por ejemplo, puede que se aproxime a cero en x1 = 2e-10->4e-11->5e-12->..., y se tendría un error aproximado siempre mayor a 1%</p>
+            <input id="decimals" formControlName="decimals" placeholder="ej. 10" />
         </div>
         <button type="submit" [disabled]="form.invalid">Encontrar raíz</button>
     </form>
@@ -40,7 +41,8 @@
         <h2>Resultado Final</h2>
         <p><strong>Raíz encontrada:</strong> {{ root }}</p>
         <p><strong>Error:</strong> {{ iterations[iterations.length-1].error * 100 }}%</p>
-        <p *ngIf="numberIsNan(iterations[iterations.length-1].error)">En algunas ocasiones, se llega a la raíz pero se obtiene NaN en x1 y por consecuencia en el error también. Por ejemplo, en 2x^e, f(x) y todas las derivadas son 0 en la raíz x = 0 y x1 resulta NaN, pero la raíz es encontrada.</p>
+        <p *ngIf="rootFoundWhenX1IsZero(iterations[iterations.length-1].x0, iterations[iterations.length-1].x1)">En ocasiones como sin((x)*(pi/180)), se llega a x1=x0=0 y se produciría división entre cero cíclica al calcular el error aproximado (denominador = 0). Para evitar esto, cuando se llega a f(x0) = 0 en algún punto, se detienen las iteraciones directamente, pues la raíz ya ha sido encontrada.</p>
+        <p *ngIf="numberIsNan(iterations[iterations.length-1].error)">En algunas ocasiones, se llega a la raíz pero se obtiene NaN en el error o x1 debido a errores al evaluar la fórmula de Newton-Raphson mejorado para obtener x1. Por ejemplo, en 2x^e, f(x) y todas las derivadas son 0 en la raíz x = 0, lo que provoca una división entre cero y por ende x1 resulta NaN, pero se determina que al tener f(x)=0 la raíz ya ha sido encontrada.</p>
     </div>
 
     <div *ngIf="iterations.length > 0">
