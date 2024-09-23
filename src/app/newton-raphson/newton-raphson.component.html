@@ -57,6 +57,7 @@
         </div>
         <div class="iteration-controls">
             <button (click)="prevIteration()" [disabled]="currentIterationIndex === 0">Anterior</button>
+            <input type="number" [(ngModel)]="currentIterationIndex" [min]="0" [max]="iterations.length - 1" placeholder="0>=i>=n-1">
             <button (click)="nextIteration()"
                 [disabled]="currentIterationIndex === iterations.length - 1">Siguiente</button>
         </div>
