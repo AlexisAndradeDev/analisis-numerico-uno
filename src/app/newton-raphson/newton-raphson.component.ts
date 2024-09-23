@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { derivative, equal, evaluate, isComplex, isZero, parse, round, smaller } from 'mathjs';
 import { Iteration } from '../interface/iteration';
 import { NgApexchartsModule } from 'ng-apexcharts';
@@ -11,7 +11,7 @@ declare var MathJax: any;
 @Component({
   selector: 'app-newton-raphson',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, NgApexchartsModule],
+  imports: [ReactiveFormsModule, CommonModule, NgApexchartsModule, FormsModule],
   templateUrl: './newton-raphson.component.html',
   styleUrls: ['./newton-raphson.component.scss']
 })
