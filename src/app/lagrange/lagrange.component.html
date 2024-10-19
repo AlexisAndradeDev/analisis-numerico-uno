@@ -1,0 +1,32 @@
+<!-- Angular 17 -->
+<div class="container">
+    <h1>Interpolación de Lagrange</h1>
+
+    <div class="margin-section">
+        <label for="numPoints">Número de puntos:</label>
+        <input type="number" id="numPoints" name="numPoints" min="1" [(ngModel)]="numPoints"
+            (ngModelChange)="updatePoints()">
+    </div>
+    <div class="margin-section">
+        <button (click)="addBlankPoint()">Agregar fila</button>
+        <button (click)="removeLastPoint()">Eliminar fila</button>
+    </div>
+    <div class="margin-section">
+        <table>
+            <thead>
+                <tr>
+                    <th>X</th>
+                    <th>Y</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let point of points; let i = index; trackBy: trackByIndex">
+                    <td><input type="number" [(ngModel)]="point.x" required></td>
+                    <td><input type="number" [(ngModel)]="point.y" required></td>
+                    <td><button (click)="removePoint(i)" class="red-btn">X</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
