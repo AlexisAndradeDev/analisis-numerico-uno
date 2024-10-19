@@ -37,9 +37,16 @@
     </div>
     <div class="margin-section">
         <button (click)="executeInterpolation()">Calcular Y con interpolación de Lagrange</button>
+
+        <div class="margin-section">
+            <div class="latex-container">
+                <div id="y-procedure-latex" style="margin-top: 20px;"></div>                
+            </div>
+        </div>
+
         <div *ngIf="result !== undefined" class="result-container">
             <p><b>Resultado:</b></p>
-            <p>{{ result }}</p>
+            <p><b>y = </b>{{ result }}</p>
         </div>
     </div>
 </div>

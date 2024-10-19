@@ -2,28 +2,25 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Point } from 'chart.js';
-import { prod, sum } from 'mathjs';
+import { evaluate, parse, prod, sum } from 'mathjs';
+import { NgApexchartsModule } from 'ng-apexcharts';
+
+declare var MathJax: any;
 
 @Component({
   selector: 'app-lagrange',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, NgApexchartsModule],
   templateUrl: './lagrange.component.html',
   styleUrl: './lagrange.component.scss'
 })
-export class LagrangeComponent implements OnChanges, AfterViewInit {
+export class LagrangeComponent implements AfterViewInit {
   numPoints: number = 1;
   points: Point[] = [];
   result: number | undefined = undefined;
   x: number | undefined = undefined;
 
   constructor() {
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['numPoints'] || changes['points']) {
-      this.updatePoints();
-    }
   }
 
   ngAfterViewInit() {
@@ -35,7 +32,7 @@ export class LagrangeComponent implements OnChanges, AfterViewInit {
       // eliminar los últimos elementos si el número de puntos debe ser menor
       // a la longitud de la lista de puntos actual
       if (this.points.length > this.numPoints) {
-        this.points = this.points.slice(0, this.numPoints - 1);
+        this.points = this.points.slice(0, this.numPoints);
       }
       // fillear elementos añadidos con (0, 0)
       for (let i = this.points.length; i < this.numPoints; i++) {
@@ -45,6 +42,8 @@ export class LagrangeComponent implements OnChanges, AfterViewInit {
       console.error('Number of points is not an integer or is <= 0.');
     }
     console.log(`(updatePoints) Points: ${this.points}`);
+
+    this.renderMath();
   }
 
   addBlankPoint() {
@@ -91,11 +90,53 @@ export class LagrangeComponent implements OnChanges, AfterViewInit {
     return y;
   }
 
+  renderMath() {
+    const yProcedureLatex = document.getElementById('y-procedure-latex');
+
+    if (yProcedureLatex) {
+      try {
+        let latex = '';
+
+        for (let i = 0; i < this.points.length; i++) {
+          // crear término látex de la multiplicatoria
+          let productLatex = `(${this.points[i].y})(`;
+          for (let j = 0; j < this.points.length; j++) {
+            if (j === i) continue;
+
+            let x_i = this.points[i].x;
+            let x_j = this.points[j].x;
+
+            productLatex += `((${this.x} - ${x_j})`;
+            let denominator = `${x_i} - ${x_j}`;
+            productLatex += `/(${denominator}))`;
+          }
+
+          // añade un + si todavía quedan más términos por agregar en la
+          // sumatoria
+          latex += `${productLatex})` + (i < this.points.length - 1 ? ' + ' : '');
+        }
+
+        // parsear el LaTex obtenido y desplegarlo en HTML
+        const parsed = parse(latex);
+        const latex_ = parsed.toTex();
+        yProcedureLatex.innerHTML = `$$y = ${latex_} = ${this.result}$$`;
+        MathJax.typesetPromise([yProcedureLatex]);
+      } catch (error) {
+        yProcedureLatex.innerHTML = '';
+        console.error('Could not display Y as LaTex.');
+      }
+    }
+  }
+
   executeInterpolation() {
-    if (this.x) {
+    if (this.x && Number.isInteger(this.x)) {
       this.result = this.lagrangeInterpolation(this.x);
+      this.renderMath();
     } else {
-      alert("Introduzca un valor para X.")
+      this.result = undefined;
+      let yProcedureLatex = document.getElementById('y-procedure-latex');
+      if (yProcedureLatex) { yProcedureLatex.innerHTML = ''; }
+      alert("Introduzca un valor numérico para X.")
     }
   }
 }
