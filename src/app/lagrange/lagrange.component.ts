@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Point } from 'chart.js';
+import { prod, sum } from 'mathjs';
 
 @Component({
   selector: 'app-lagrange',
@@ -13,6 +14,8 @@ import { Point } from 'chart.js';
 export class LagrangeComponent implements OnChanges, AfterViewInit {
   numPoints: number = 1;
   points: Point[] = [];
+  result: number | undefined = undefined;
+  x: number | undefined = undefined;
 
   constructor() {
   }
@@ -65,5 +68,34 @@ export class LagrangeComponent implements OnChanges, AfterViewInit {
 
   trackByIndex(index: number, obj: any): any {
     return index;
+  }
+
+  lagrangeInterpolation(x: number) {
+    let y = 0;
+
+    for (let i = 0; i < this.points.length; i++) {
+      let y_i = this.points[i].y;
+      let product = y_i;
+
+      for (let j = 0; j < this.points.length; j++) {
+        if (j === i) continue;
+
+        let x_i = this.points[i].x;
+        let x_j = this.points[j].x;
+        product *= ((x - x_j) / (x_i - x_j));
+      }
+
+      y += product;
+    }
+
+    return y;
+  }
+
+  executeInterpolation() {
+    if (this.x) {
+      this.result = this.lagrangeInterpolation(this.x);
+    } else {
+      alert("Introduzca un valor para X.")
+    }
   }
 }

@@ -32,6 +32,14 @@
     </div>
 
     <div class="margin-section">
-        
+        <label for="xValue">Valor de X:</label>
+        <input type="number" id="xValue" [(ngModel)]="x" placeholder="Número">
+    </div>
+    <div class="margin-section">
+        <button (click)="executeInterpolation()">Calcular Y con interpolación de Lagrange</button>
+        <div *ngIf="result !== undefined" class="result-container">
+            <p><b>Resultado:</b></p>
+            <p>{{ result }}</p>
+        </div>
     </div>
 </div>
