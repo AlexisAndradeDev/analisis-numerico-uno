@@ -1,3 +1,8 @@
+$primary-color: #0097a7;
+$secondary-color: #f9f9f9;
+$border-color: #ddd;
+$text-color: #333;
+
 .container {
     max-width: 800px;
     margin: 0 auto;
@@ -12,7 +17,8 @@
     margin-bottom: 30px;
 }
 
-h1, h2 {
+h1,
+h2 {
     text-align: center;
     color: #0097a7;
     margin-bottom: 20px;
@@ -56,4 +62,36 @@ button:hover {
 
 .red-btn:hover {
     background-color: darken(#b30b0b, 5%);
+}
+
+.table-container {
+    overflow-x: auto;
+    max-height: 600px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    min-width: 300px;
+}
+
+th,
+td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid $border-color;
+}
+
+th {
+    background-color: $primary-color;
+    color: #fff;
+}
+
+td input[type="number"] {
+    width: 80px;
+    padding: 8px;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
