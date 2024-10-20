@@ -47,6 +47,10 @@
         <div *ngIf="result !== undefined" class="result-container">
             <p><b>Resultado:</b></p>
             <p><b>y = </b>{{ result }}</p>
+
+            <div class="margin-section">
+                <apx-chart [series]="chartSeries" [chart]="chart" [xaxis]="xaxis" [yaxis]="yaxis" [title]="title" ></apx-chart>
+            </div>
         </div>
     </div>
 </div>

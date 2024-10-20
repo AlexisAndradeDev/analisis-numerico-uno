@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Point } from 'chart.js';
 import { isNaN, isNumber, round } from 'mathjs';
 import nerdamer from 'nerdamer';
-import { NgApexchartsModule } from 'ng-apexcharts';
+import { ApexAxisChartSeries, ApexChart, ApexMarkers, ApexTitleSubtitle, ApexXAxis, ApexYAxis, NgApexchartsModule } from 'ng-apexcharts';
 
 declare var MathJax: any;
 
@@ -20,6 +20,36 @@ export class LagrangeComponent implements AfterViewInit {
   points: Point[] = [];
   result: number | undefined = undefined;
   x: number = NaN;
+  chartSeries: ApexAxisChartSeries = [];
+  chart: ApexChart = {
+    type: 'line',
+    height: 500,
+  };
+  xaxis: ApexXAxis = {
+    title: {
+      text: 'x'
+    },
+    tickAmount: 4,
+    decimalsInFloat: 5,
+    labels: {
+      // para mostrar decimales en X al pasar el mouse encima de la gráfica
+      formatter: function (val) {
+        let num = Number.parseFloat(val);
+        return num.toFixed(5); 
+      }
+    }
+  };
+  yaxis: ApexYAxis = {
+    title: {
+      text: 'y'
+    },
+    tickAmount: 4,
+    decimalsInFloat: 5
+  };
+  title: ApexTitleSubtitle = {
+    text: 'Interpolación de Lagrange',
+    align: 'left'
+  };
 
   constructor() {
   }
@@ -74,6 +104,11 @@ export class LagrangeComponent implements AfterViewInit {
     return isNumber(num) && !isNaN(num);
   }
 
+  /**
+   * Genera el valor interpolado para la coordenada X en Y.
+   * @param x Coordenada en X a interpolar.
+   * @returns Valor interpolado de X en Y redondeado a 15 decimales.
+   */
   lagrangeInterpolation(x: number) {
     let y = 0;
 
@@ -137,8 +172,8 @@ export class LagrangeComponent implements AfterViewInit {
         }
 
         // obtener el polinomio, parsear el LaTex obtenido y desplegarlo en HTML
-        let polynomial = nerdamer(latex).expand();
-        yProcedureLatex.innerHTML = `$$y = ${polynomial.toTeX()}$$`;
+        let polynomialLatex = nerdamer(latex).expand().toTeX();
+        yProcedureLatex.innerHTML = `$$y = ${polynomialLatex}$$`;
         MathJax.typesetPromise([yProcedureLatex]);
       } catch (error) {
         yProcedureLatex.innerHTML = '';
@@ -152,10 +187,56 @@ export class LagrangeComponent implements AfterViewInit {
     if (this.numberHasValue(this.x)) {
       this.result = this.lagrangeInterpolation(this.x);
       this.renderMath();
+      this.updateChart()
     } else {
       let yProcedureLatex = document.getElementById('y-procedure-latex');
       if (yProcedureLatex) { yProcedureLatex.innerHTML = ''; }
       alert("Introduzca un valor numérico para X.")
     }
+  }
+
+  /**
+   * Generar puntos para dibujar la curva de interpolación.
+   * @param maxPoints Número de puntos a generar para dibujar la línea.
+   * @returns Arreglo de puntos {x, y} para graficar la curva de interpolación.
+   */
+  generateInterpolatedPoints(maxPoints: number) {
+    let interpolatedSeries: { x: number; y: number }[] = [];
+    let minX = Math.min(...this.points.map(p => p.x), this.x);
+    let maxX = Math.max(...this.points.map(p => p.x), this.x);
+    let extra = (maxX - minX) * 0.20;
+    minX -= extra;
+    maxX += extra;
+
+    let step = (maxX - minX) / maxPoints;
+    for (let i = 0; i <= maxPoints; i++) {
+      let currentX = minX + i * step;
+      let currentY = this.lagrangeInterpolation(currentX);
+      interpolatedSeries.push({ x: currentX, y: currentY });
+    }
+
+    return interpolatedSeries;
+  }
+
+  /**
+   * Dibuja la interpolación como una curva y el punto X.
+   */
+  updateChart() {
+    const maxPoints = 500;
+    let interpolatedSeries = this.generateInterpolatedPoints(maxPoints);
+
+    this.chartSeries = [
+      {
+        name: 'Curva de interpolación',
+        data: interpolatedSeries,
+        type: 'line'
+      },
+      {
+        name: 'Punto X',
+        data: [{ x: this.x, y: this.result }],
+        type: 'scatter',
+        color: '#FF4560',
+      }
+    ];
   }
 }
