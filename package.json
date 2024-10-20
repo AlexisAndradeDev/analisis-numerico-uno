@@ -20,6 +20,7 @@
     "@angular/router": "^17.3.0",
     "apexcharts": "^3.45.2",
     "chart.js": "^4.4.4",
+    "decimal.js": "^10.4.3",
     "mathjax-angular": "^2.2.1",
     "mathjs": "^13.1.1",
     "nerdamer": "^1.1.13",
