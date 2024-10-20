@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Point } from 'chart.js';
-import { evaluate, parse, prod, sum } from 'mathjs';
+import { isNaN, isNumber, round } from 'mathjs';
+import nerdamer from 'nerdamer';
 import { NgApexchartsModule } from 'ng-apexcharts';
 
 declare var MathJax: any;
@@ -18,7 +19,7 @@ export class LagrangeComponent implements AfterViewInit {
   numPoints: number = 1;
   points: Point[] = [];
   result: number | undefined = undefined;
-  x: number | undefined = undefined;
+  x: number = NaN;
 
   constructor() {
   }
@@ -69,6 +70,10 @@ export class LagrangeComponent implements AfterViewInit {
     return index;
   }
 
+  numberHasValue(num: number | null | undefined): boolean {
+    return isNumber(num) && !isNaN(num);
+  }
+
   lagrangeInterpolation(x: number) {
     let y = 0;
 
@@ -87,10 +92,15 @@ export class LagrangeComponent implements AfterViewInit {
       y += product;
     }
 
-    return y;
+    return round(y, 15);
   }
 
   renderMath() {
+    if (!this.numberHasValue(this.x)) {
+      console.error('Could not display Y as LaTex. X is not a number')
+      return;
+    }
+
     const yProcedureLatex = document.getElementById('y-procedure-latex');
 
     if (yProcedureLatex) {
@@ -98,42 +108,51 @@ export class LagrangeComponent implements AfterViewInit {
         let latex = '';
 
         for (let i = 0; i < this.points.length; i++) {
-          // crear término látex de la multiplicatoria
-          let productLatex = `(${this.points[i].y})(`;
+          // término i de la sumatoria
+          let termLatex = `${this.points[i].y}`;
+
+          // multiplicatoria del término i
+          let productLatex = '';
           for (let j = 0; j < this.points.length; j++) {
             if (j === i) continue;
 
             let x_i = this.points[i].x;
             let x_j = this.points[j].x;
 
-            productLatex += `((${this.x} - ${x_j})`;
+            productLatex += `((x - ${x_j})`;
             let denominator = `${x_i} - ${x_j}`;
             productLatex += `/(${denominator}))`;
           }
+          if (productLatex) {
+            // (multiplicatoria)(y)
+            termLatex = `(${productLatex})` + `(${termLatex})`;
+          }
 
+          latex += termLatex;
           // añade un + si todavía quedan más términos por agregar en la
           // sumatoria
-          latex += `${productLatex})` + (i < this.points.length - 1 ? ' + ' : '');
+          if (i < this.points.length - 1) {
+            latex += ' + ';
+          }
         }
 
-        // parsear el LaTex obtenido y desplegarlo en HTML
-        const parsed = parse(latex);
-        const latex_ = parsed.toTex();
-        yProcedureLatex.innerHTML = `$$y = ${latex_} = ${this.result}$$`;
+        // obtener el polinomio, parsear el LaTex obtenido y desplegarlo en HTML
+        let polynomial = nerdamer(latex).expand();
+        yProcedureLatex.innerHTML = `$$y = ${polynomial.toTeX()}$$`;
         MathJax.typesetPromise([yProcedureLatex]);
       } catch (error) {
         yProcedureLatex.innerHTML = '';
-        console.error('Could not display Y as LaTex.');
+        console.error(`Could not display Y as LaTex. ${error}`);
       }
     }
   }
 
   executeInterpolation() {
-    if (this.x && Number.isInteger(this.x)) {
+    this.result = undefined;
+    if (this.numberHasValue(this.x)) {
       this.result = this.lagrangeInterpolation(this.x);
       this.renderMath();
     } else {
-      this.result = undefined;
       let yProcedureLatex = document.getElementById('y-procedure-latex');
       if (yProcedureLatex) { yProcedureLatex.innerHTML = ''; }
       alert("Introduzca un valor numérico para X.")

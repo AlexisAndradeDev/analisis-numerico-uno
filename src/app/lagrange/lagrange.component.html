@@ -33,7 +33,7 @@
 
     <div class="margin-section">
         <label for="xValue">Valor de X:</label>
-        <input type="number" id="xValue" [(ngModel)]="x" placeholder="Número">
+        <input type="number" id="xValue" [(ngModel)]="x" placeholder="Número" required>
     </div>
     <div class="margin-section">
         <button (click)="executeInterpolation()">Calcular Y con interpolación de Lagrange</button>

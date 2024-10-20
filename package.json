@@ -22,6 +22,7 @@
     "chart.js": "^4.4.4",
     "mathjax-angular": "^2.2.1",
     "mathjs": "^13.1.1",
+    "nerdamer": "^1.1.13",
     "ng-apexcharts": "^1.9.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
