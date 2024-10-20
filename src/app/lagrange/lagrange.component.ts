@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Point } from 'chart.js';
-import { isNaN, isNumber, round } from 'mathjs';
+import Decimal from 'decimal.js';
+import { ceil, floor, isNaN, isNumber, round } from 'mathjs';
 import nerdamer from 'nerdamer';
 import { ApexAxisChartSeries, ApexChart, ApexMarkers, ApexTitleSubtitle, ApexXAxis, ApexYAxis, NgApexchartsModule } from 'ng-apexcharts';
 
@@ -72,7 +73,6 @@ export class LagrangeComponent implements AfterViewInit {
     } else {
       console.error('Number of points is not an integer or is <= 0.');
     }
-    console.log(`(updatePoints) Points: ${this.points}`);
 
     this.renderMath();
   }
@@ -105,29 +105,49 @@ export class LagrangeComponent implements AfterViewInit {
   }
 
   /**
+   * Retorna verdadero si hay algúna X duplicada en la lista de puntos.
+   */
+  checkIfAnyDuplicateX(): boolean {
+    const uniqueXValues = new Set(this.points.map(point => point.x));
+    return uniqueXValues.size !== this.points.length;
+  }
+
+  /**
    * Genera el valor interpolado para la coordenada X en Y.
    * @param x Coordenada en X a interpolar.
+   * @param showAlerts Si es verdadero, se muestran alertas para avisar de errores al usuario. Por defecto es falso.
    * @returns Valor interpolado de X en Y redondeado a 15 decimales.
    */
-  lagrangeInterpolation(x: number) {
-    let y = 0;
+  lagrangeInterpolation(x: number, showAlerts: boolean = false) {
+    if (this.checkIfAnyDuplicateX()) {
+      if (showAlerts) {
+        alert("No se puede realizar la interpolación de Lagrange con valores X duplicados.");
+      }
+      return undefined;
+    }
+
+    let y = new Decimal(0);
+    let x_ = new Decimal(x);
 
     for (let i = 0; i < this.points.length; i++) {
-      let y_i = this.points[i].y;
+      let y_i = new Decimal(this.points[i].y);
       let product = y_i;
 
       for (let j = 0; j < this.points.length; j++) {
         if (j === i) continue;
 
-        let x_i = this.points[i].x;
-        let x_j = this.points[j].x;
-        product *= ((x - x_j) / (x_i - x_j));
+        let x_i = new Decimal(this.points[i].x);
+        let x_j = new Decimal(this.points[j].x);
+        product = product.times(
+          (x_.minus(x_j)).dividedBy(
+            x_i.minus(x_j))
+        );
       }
 
-      y += product;
+      y = y.plus(product);
     }
 
-    return round(y, 15);
+    return y.toNumber();
   }
 
   renderMath() {
@@ -185,7 +205,7 @@ export class LagrangeComponent implements AfterViewInit {
   executeInterpolation() {
     this.result = undefined;
     if (this.numberHasValue(this.x)) {
-      this.result = this.lagrangeInterpolation(this.x);
+      this.result = this.lagrangeInterpolation(this.x, true);
       this.renderMath();
       this.updateChart()
     } else {
@@ -202,6 +222,10 @@ export class LagrangeComponent implements AfterViewInit {
    */
   generateInterpolatedPoints(maxPoints: number) {
     let interpolatedSeries: { x: number; y: number }[] = [];
+
+    // no puede realizarse interpolación
+    if (this.checkIfAnyDuplicateX()) return interpolatedSeries;
+
     let minX = Math.min(...this.points.map(p => p.x), this.x);
     let maxX = Math.max(...this.points.map(p => p.x), this.x);
     let extra = (maxX - minX) * 0.20;
@@ -209,10 +233,11 @@ export class LagrangeComponent implements AfterViewInit {
     maxX += extra;
 
     let step = (maxX - minX) / maxPoints;
-    for (let i = 0; i <= maxPoints; i++) {
+    for (let i = 0; i < maxPoints; i++) {
       let currentX = minX + i * step;
       let currentY = this.lagrangeInterpolation(currentX);
-      interpolatedSeries.push({ x: currentX, y: currentY });
+      if (currentY !== undefined)
+        interpolatedSeries.push({ x: currentX, y: parseFloat(currentY.toFixed(14)) });
     }
 
     return interpolatedSeries;
