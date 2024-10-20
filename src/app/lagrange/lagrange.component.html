@@ -1,0 +1,56 @@
+<div class="container">
+    <h1>Interpolación de Lagrange</h1>
+
+    <div class="margin-section">
+        <label for="numPoints">Número de puntos:</label>
+        <input type="number" id="numPoints" name="numPoints" min="1" [(ngModel)]="numPoints"
+            (ngModelChange)="updatePoints()">
+    </div>
+    <div class="margin-section">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>X</th>
+                        <th>Y</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let point of points; let i = index; trackBy: trackByIndex">
+                        <td><input type="number" [(ngModel)]="point.x" required></td>
+                        <td><input type="number" [(ngModel)]="point.y" required></td>
+                        <td><button (click)="removePoint(i)" class="red-btn">X</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="margin-section">
+        <button (click)="addBlankPoint()">Agregar fila</button>
+        <button (click)="removeLastPoint()">Eliminar fila</button>
+    </div>
+
+    <div class="margin-section">
+        <label for="xValue">Valor de X:</label>
+        <input type="number" id="xValue" [(ngModel)]="x" placeholder="Número" required>
+    </div>
+    <div class="margin-section">
+        <button (click)="executeInterpolation()">Calcular Y con interpolación de Lagrange</button>
+
+        <div class="margin-section">
+            <div class="latex-container">
+                <div id="y-procedure-latex" style="margin-top: 20px;"></div>                
+            </div>
+        </div>
+
+        <div *ngIf="result !== undefined" class="result-container">
+            <p><b>Resultado:</b></p>
+            <p><b>y = </b>{{ result }}</p>
+
+            <div class="margin-section">
+                <apx-chart [series]="chartSeries" [chart]="chart" [xaxis]="xaxis" [yaxis]="yaxis" [title]="title" ></apx-chart>
+            </div>
+        </div>
+    </div>
+</div>
