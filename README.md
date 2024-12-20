@@ -1,27 +1,67 @@
-# AnalisisNumericoUno
+# Boreal Cat
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.8.
+Boreal Cat is a web application designed to facilitate numerical analysis through the use of various computational methods. Its primary objective is to solve mathematical problems, including finding unknowns in systems of equations, determining the roots of equations, and addressing other challenges that require iterative and programmable methods.
 
-## Development server
+## Table of Contents
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Implemented Methods](#implemented-methods)
+- [Getting Started](#getting-started)
+- [License](#license)
 
-## Code scaffolding
+## Features
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- User-friendly interface for performing numerical analysis.
+- Support for various computational methods to solve mathematical problems.
+- Real-time feedback and results display.
+- Interactive visualizations to enhance understanding of the methods used.
 
-## Build
+## Technologies Used
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+- Angular 17
+- TypeScript
+- HTML/CSS
 
-## Running unit tests
+## Implemented Methods
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+The following numerical methods have been implemented in Boreal Cat:
 
-## Running end-to-end tests
+- **Gauss-Jordan Elimination**: A method for solving linear systemsm.
+- **Gauss-Seidel Method**: An iterative technique for solving linear systems, which updates the solution iteratively.
+- **Lagrange Interpolation**: A polynomial interpolation method used to estimate values between known data points.
+- **Newton-Raphson Method**: An iterative method for finding successively better approximations to the roots of a real-valued function.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Getting Started
 
-## Further help
+To get started with Boreal-cat, follow these steps:
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/AlexisAndradeDev/analisis-numerico-uno.git
+   ```
+
+2. **Install dependencies:**
+
+   Make sure you have Node.js and Angular CLI installed. Install the required packages using:
+
+   ```bash
+   npm install
+   ```
+
+3. **Run the application:**
+
+   Start the development server with the following command:
+
+   ```bash
+   ng serve
+   ```
+
+4. **Access the application:**
+
+   Open a web browser and navigate to `http://localhost:4200` to access the Boreal-cat application.
+
+## License
+
+This project is licensed under the BSD 3-Clause License. See the [LICENSE](LICENSE) file for more details.
